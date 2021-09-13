@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./docker/compose/django/Dockerfile
+    env_file: ./docker/compose/django/docker-compose.env
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/app
+    environment:
+      WAIT_HOSTS: db:3306
+    depends_on:
+      - db
+  db:
+    image: mysql:5.7
+    env_file: ./docker/compose/db/docker-compose.env
+    ports:
+      - '3306:3306'
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./docker/compose/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/compose/db/init:/docker-entrypoint-initdb.d
+    init: true
+volumes:
+  db-data:
